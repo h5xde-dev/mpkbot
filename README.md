@@ -7,7 +7,7 @@ Telegram-бот для рассылки расписания преподава�
 - Привязка Telegram-аккаунта к ФИО преподавателя (один раз)
 - Показ расписания по кнопке и командам
 - Ежедневная рассылка через Vercel Cron
-- Постоянное хранение пользователей в Upstash Redis (или локально в `secret/users.json`)
+- Постоянное хранение пользователей в Neon Postgres (или локально в `secret/users.json`)
 
 ## Быстрый старт (локально)
 
@@ -39,34 +39,47 @@ npx vercel
 - **Output Directory** → `public`
 - **Build Command** → оставьте пустым или `npm run typecheck` (уже в `vercel.json`)
 
-### 2. Добавьте Storage → Upstash Redis
+### 2. Добавьте Storage → Neon Postgres
 
-В проекте Vercel: **Storage → Marketplace → Upstash Redis → Add Integration**.  
-Переменные `UPSTASH_REDIS_REST_URL` и `UPSTASH_REDIS_REST_TOKEN` подставятся автоматически.
+В проекте Vercel: **Storage → Neon → Create Database → Connect to mpkbot**.  
+Переменные `DATABASE_URL` / `POSTGRES_URL` подставятся автоматически.
 
-Без Redis бот будет работать только локально — на Vercel файловая система не сохраняет данные между запросами.
+Без Postgres бот будет работать только локально — на Vercel файловая система не сохраняет данные между запросами.  
+Таблицы `users` и `teachers_cache` создаются автоматически при первом запросе.
 
 ### 3. Задайте переменные окружения
 
 | Переменная | Обязательно | Описание |
 |---|---|---|
 | `TELEGRAM_BOT` | да | Токен бота от @BotFather |
+| `DATABASE_URL` | да (на Vercel) | Строка подключения Neon Postgres |
 | `WEBHOOK_SECRET` | рекомендуется | Секрет для проверки webhook |
 | `SETUP_SECRET` | рекомендуется | Защита эндпоинта `/api/setup` |
 | `CRON_SECRET` | рекомендуется | Защита `/api/cron` |
 
-### 4. Зарегистрируйте webhook
+### 4. Зарегистрируйте webhook (обязательно!)
 
-После первого деплоя откройте:
+Без этого шага бот **не будет получать сообщения**.
+
+После первого деплоя откройте в браузере:
 
 ```text
 https://<your-app>.vercel.app/api/setup?secret=<SETUP_SECRET>
 ```
 
-Или локально:
+Должен вернуться JSON: `"ok": true, "description": "Webhook was set"`.
+
+Или из терминала:
 
 ```bash
-PUBLIC_URL=https://<your-app>.vercel.app npm run setup-webhook
+npm run setup-webhook:prod
+```
+
+Проверка:
+
+```bash
+curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"
+# поле "url" должно быть https://<your-app>.vercel.app/api/webhook
 ```
 
 ### 5. Проверьте бота
@@ -93,5 +106,5 @@ PUBLIC_URL=https://<your-app>.vercel.app npm run setup-webhook
 api/           — serverless-функции Vercel
 src/bot/       — обработчики Telegram
 src/services/  — API расписания и Telegram
-src/storage/   — хранилище пользователей (KV / файл)
+src/storage/   — хранилище пользователей (Postgres / файл)
 ```

@@ -9,7 +9,7 @@ import {
   teachersCacheFile,
   teachersCacheTtlMs,
 } from '../config.js';
-import { getRedis, useRedisStorage } from '../redis.js';
+import { ensureSchema, getSql, usePostgresStorage } from '../db.js';
 import {
   capitalizeDay,
   formatRuWeekday,
@@ -17,16 +17,23 @@ import {
   sleep,
 } from '../utils.js';
 
-const KV_TEACHERS_KEY = 'mpkbot:teachers';
-const KV_TEACHERS_AT_KEY = 'mpkbot:teachers:cached_at';
-
 async function readTeachersCache(): Promise<string[] | null> {
-  if (useRedisStorage()) {
-    const cachedAt = await getRedis().get<number>(KV_TEACHERS_AT_KEY);
-    if (!cachedAt) return null;
+  if (usePostgresStorage()) {
+    await ensureSchema();
+    const rows = await getSql()`
+      SELECT teachers, cached_at
+      FROM teachers_cache
+      WHERE id = 1
+      LIMIT 1
+    ` as Array<{ teachers: string[]; cached_at: Date | string }>;
 
+    const row = rows[0];
+    if (!row) return null;
+
+    const cachedAt = new Date(row.cached_at).getTime();
     if (Date.now() - cachedAt > teachersCacheTtlMs) return null;
-    return (await getRedis().get<string[]>(KV_TEACHERS_KEY)) ?? null;
+
+    return row.teachers;
   }
 
   if (!existsSync(teachersCacheFile)) return null;
@@ -39,9 +46,17 @@ async function readTeachersCache(): Promise<string[] | null> {
 }
 
 async function writeTeachersCache(teachers: string[]): Promise<void> {
-  if (useRedisStorage()) {
-    await getRedis().set(KV_TEACHERS_KEY, teachers);
-    await getRedis().set(KV_TEACHERS_AT_KEY, Date.now());
+  if (usePostgresStorage()) {
+    await ensureSchema();
+    const cachedAt = new Date().toISOString();
+
+    await getSql()`
+      INSERT INTO teachers_cache (id, teachers, cached_at)
+      VALUES (1, ${teachers}, ${cachedAt})
+      ON CONFLICT (id) DO UPDATE SET
+        teachers = EXCLUDED.teachers,
+        cached_at = EXCLUDED.cached_at
+    `;
     return;
   }
 

@@ -22,13 +22,13 @@ export default async function handler(
     return response.status(400).json({ error: 'Invalid update' });
   }
 
-  response.status(200).json({ ok: true });
-
   try {
     const telegram = new TelegramClient(getBotToken());
     const handlers = new BotHandlers(telegram);
     await handlers.handleUpdate(update);
+    return response.status(200).json({ ok: true });
   } catch (error) {
     console.error('Ошибка обработки update:', error);
+    return response.status(500).json({ error: 'Handler failed' });
   }
 }
