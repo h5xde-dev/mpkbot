@@ -34,6 +34,11 @@ npx vercel
 
 Или подключите GitHub-репозиторий в [vercel.com](https://vercel.com).
 
+В настройках проекта Vercel (если деплой падает):
+- **Framework Preset** → `Other`
+- **Output Directory** → `public`
+- **Build Command** → оставьте пустым или `npm run typecheck` (уже в `vercel.json`)
+
 ### 2. Добавьте Storage → Upstash Redis
 
 В проекте Vercel: **Storage → Marketplace → Upstash Redis → Add Integration**.  

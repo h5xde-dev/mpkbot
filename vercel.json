@@ -1,7 +1,15 @@
 {
   "version": 2,
+  "framework": null,
   "buildCommand": "npm run typecheck",
+  "installCommand": "npm install",
+  "outputDirectory": "public",
   "devCommand": "",
+  "functions": {
+    "api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
   "rewrites": [
     {
       "source": "/",
