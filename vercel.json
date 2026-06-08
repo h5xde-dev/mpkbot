@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "buildCommand": "npm run typecheck",
+  "devCommand": "",
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/api/health"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "0 5 * * *"
+    }
+  ]
+}
