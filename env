@@ -1,0 +1,27 @@
+TELEGRAM_BOT=7587735640:AAHsy_hIEsonQXdQcssFV8fbJ9yq8pL9m24
+WEBHOOK_SECRET=my-local-webhook-secret-123
+SETUP_SECRET=my-local-setup-secret-456
+CRON_SECRET=my-local-cron-secret-789
+
+# Recommended for most uses
+DATABASE_URL=postgresql://neondb_owner:npg_K6uXs3rxqLSn@ep-lucky-pine-apgnwe1b-pooler.c-7.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+
+# For uses requiring a connection without pgbouncer
+DATABASE_URL_UNPOOLED=postgresql://neondb_owner:npg_K6uXs3rxqLSn@ep-lucky-pine-apgnwe1b.c-7.us-east-1.aws.neon.tech/neondb?sslmode=require
+
+# Parameters for constructing your own connection string
+PGHOST=ep-lucky-pine-apgnwe1b-pooler.c-7.us-east-1.aws.neon.tech
+PGHOST_UNPOOLED=ep-lucky-pine-apgnwe1b.c-7.us-east-1.aws.neon.tech
+PGUSER=neondb_owner
+PGDATABASE=neondb
+PGPASSWORD=npg_K6uXs3rxqLSn
+
+# Parameters for Vercel Postgres Templates
+POSTGRES_URL=postgresql://neondb_owner:npg_K6uXs3rxqLSn@ep-lucky-pine-apgnwe1b-pooler.c-7.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+POSTGRES_URL_NON_POOLING=postgresql://neondb_owner:npg_K6uXs3rxqLSn@ep-lucky-pine-apgnwe1b.c-7.us-east-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
+POSTGRES_USER=neondb_owner
+POSTGRES_HOST=ep-lucky-pine-apgnwe1b-pooler.c-7.us-east-1.aws.neon.tech
+POSTGRES_PASSWORD=npg_K6uXs3rxqLSn
+POSTGRES_DATABASE=neondb
+POSTGRES_URL_NO_SSL=postgresql://neondb_owner:npg_K6uXs3rxqLSn@ep-lucky-pine-apgnwe1b-pooler.c-7.us-east-1.aws.neon.tech/neondb
+POSTGRES_PRISMA_URL=postgresql://neondb_owner:npg_K6uXs3rxqLSn@ep-lucky-pine-apgnwe1b-pooler.c-7.us-east-1.aws.neon.tech/neondb?channel_binding=require&connect_timeout=15&sslmode=require

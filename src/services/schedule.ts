@@ -13,9 +13,11 @@ import { ensureSchema, getSql, usePostgresStorage } from '../db.js';
 import {
   capitalizeDay,
   formatRuWeekday,
-  normalizeTeacherName,
+  matchTeacherName,
   sleep,
 } from '../utils.js';
+
+export { matchTeacherName };
 
 async function readTeachersCache(): Promise<string[] | null> {
   if (usePostgresStorage()) {
@@ -52,7 +54,7 @@ async function writeTeachersCache(teachers: string[]): Promise<void> {
 
     await getSql()`
       INSERT INTO teachers_cache (id, teachers, cached_at)
-      VALUES (1, ${teachers}, ${cachedAt})
+      VALUES (1, ${JSON.stringify(teachers)}::jsonb, ${cachedAt})
       ON CONFLICT (id) DO UPDATE SET
         teachers = EXCLUDED.teachers,
         cached_at = EXCLUDED.cached_at
@@ -113,22 +115,6 @@ export async function fetchSchedule(
 ): Promise<Record<string, unknown>> {
   const response = await postSchedule({ type: '2', teacher: teacherName });
   return (await response.json()) as Record<string, unknown>;
-}
-
-export function matchTeacherName(
-  input: string,
-  teachers: string[],
-): string | null {
-  const normalizedInput = normalizeTeacherName(input);
-  if (!normalizedInput) return null;
-
-  for (const teacher of teachers) {
-    if (normalizeTeacherName(teacher) === normalizedInput) {
-      return teacher;
-    }
-  }
-
-  return null;
 }
 
 function formatSchedule(
